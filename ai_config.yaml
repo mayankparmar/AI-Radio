@@ -1,0 +1,240 @@
+# AI Radio Configuration
+# Separate config for AI-generated talk show channels
+
+# LLM Provider Configuration
+llm:
+  # Options: ollama, openai, anthropic, llamacpp
+  provider: "ollama"
+
+  # Provider-specific settings
+  providers:
+    ollama:
+      base_url: "http://localhost:11434"
+      model: "llama3.2:3b"
+      timeout: 60
+
+    openai:
+      api_key: "${OPENAI_API_KEY}"  # Set via environment variable
+      model: "gpt-4"
+      base_url: "https://api.openai.com/v1"
+      timeout: 30
+
+    anthropic:
+      api_key: "${ANTHROPIC_API_KEY}"  # Set via environment variable
+      model: "claude-3-5-sonnet-20241022"
+      timeout: 30
+
+    llamacpp:
+      model_path: "/models/llama-7b.gguf"
+      n_ctx: 2048
+      n_threads: 4
+
+# TTS (Text-to-Speech) Configuration
+tts:
+  # Options: piper, coqui, espeak, festival
+  provider: "piper"
+
+  # Provider-specific settings
+  providers:
+    piper:
+      model_path: "./models/piper/en_US-lessac-medium.onnx"
+      config_path: "./models/piper/en_US-lessac-medium.onnx.json"
+      speaker_id: 0
+      length_scale: 1.0  # Speed: <1 faster, >1 slower
+      noise_scale: 0.667
+      noise_w: 0.8
+
+    coqui:
+      model_name: "tts_models/en/ljspeech/tacotron2-DDC"
+      vocoder_name: "vocoder_models/en/ljspeech/hifigan_v2"
+
+    espeak:
+      voice: "en-us"
+      speed: 175  # words per minute
+      pitch: 50
+
+    festival:
+      voice: "cmu_us_slt_arctic_hts"
+
+# Content Generation Settings
+generation:
+  segment_length_seconds: 30  # Length of each generated audio segment
+  buffer_segments: 2  # Number of segments to pre-generate
+  temperature: 0.85  # LLM creativity (0.0-2.0)
+  max_tokens: 600  # Maximum tokens per generation
+  stream_response: false  # Stream LLM response (not recommended for audio)
+
+  # Variation settings to prevent repetition
+  variation:
+    enabled: true
+    history_size: 10  # Remember last N topics
+    randomize_prompts: true  # Slightly vary prompts each time
+
+# Audio Processing Settings
+audio:
+  sample_rate: 22050  # Hz (Piper default)
+  channels: 1  # Mono
+  format: "int16"  # Sample format
+
+  # Effects library: sox, ffmpeg, or python
+  effects_engine: "python"
+
+  # Noise/static for inter-channel tuning
+  inter_channel_noise:
+    enabled: true
+    type: "white"  # white, pink, brown
+    volume: 0.3  # 0.0-1.0
+
+# Reality Channel Definitions
+channels:
+  - name: "DinoTalk FM"
+    enabled: true
+    encoder_position_range: [0, 19]  # Dial positions 0-19 (out of 0-99)
+    prompt_template_file: "prompts/dino_talk.txt"
+    description: "Morning show from a reality where dinosaurs evolved intelligence"
+
+    voice_config:
+      # Voice effects for this channel
+      pitch_shift_semitones: -5  # Deeper voice for dinosaurs
+      reverb_amount: 0.3  # 0.0-1.0
+      echo_delay_ms: 0
+      speed_factor: 0.95  # Slightly slower speech
+
+    background_audio:
+      enabled: true
+      file: "audio/backgrounds/jungle_ambiance.mp3"
+      volume: 0.1  # Very quiet background
+
+  - name: "Quantum Uncertainty Hour"
+    enabled: true
+    encoder_position_range: [20, 39]
+    prompt_template_file: "prompts/quantum.txt"
+    description: "Host exists in quantum superposition across timelines"
+
+    voice_config:
+      pitch_shift_semitones: 0
+      reverb_amount: 0.4
+      chorus_enabled: true  # Multi-voice effect
+      tremolo_rate_hz: 3.0  # Voice wavering
+      tremolo_depth: 0.3
+      speed_factor: 1.0
+
+    background_audio:
+      enabled: true
+      file: "audio/backgrounds/quantum_hum.mp3"
+      volume: 0.08
+
+  - name: "Mycelium Network News"
+    enabled: true
+    encoder_position_range: [40, 59]
+    prompt_template_file: "prompts/mycelium.txt"
+    description: "Fungal consciousness broadcasting slow, interconnected thoughts"
+
+    voice_config:
+      pitch_shift_semitones: -8  # Very deep, whispered
+      reverb_amount: 0.8  # Heavy cave-like reverb
+      echo_delay_ms: 300
+      speed_factor: 0.6  # 40% slower than normal
+      low_pass_filter_hz: 2000  # Muffle high frequencies
+
+    background_audio:
+      enabled: true
+      file: "audio/backgrounds/underground_drips.mp3"
+      volume: 0.12
+
+  - name: "Nebula Broadcasts"
+    enabled: true
+    encoder_position_range: [60, 79]
+    prompt_template_file: "prompts/nebula.txt"
+    description: "Post-biological plasma entities from Andromeda galaxy"
+
+    voice_config:
+      pitch_shift_semitones: 3  # Slightly higher, ethereal
+      reverb_amount: 0.9  # Maximum space-like reverb
+      multi_voice_layers: 3  # Stack multiple voices
+      layer_pitch_offsets: [0, 2, -2]  # Harmonic layering
+      speed_factor: 1.1  # Slightly faster
+      chorus_enabled: true
+
+    background_audio:
+      enabled: true
+      file: "audio/backgrounds/cosmic_radiation.mp3"
+      volume: 0.15
+
+  - name: "Channel X-NULL"
+    enabled: true
+    encoder_position_range: [80, 99]
+    prompt_template_file: "prompts/xnull.txt"
+    description: "Non-linguistic entities - pure data/mathematics/alien signals"
+
+    # Special mode for this channel
+    audio_mode: "sonification"  # Not normal TTS
+
+    sonification:
+      method: "data_to_frequency"  # Options: data_to_frequency, morse_beep, extreme_tts, hybrid
+
+      # Data-to-frequency mapping
+      data_mapping:
+        digit_freq_base: 200  # Hz
+        digit_freq_step: 80   # Each digit adds this much Hz
+        letter_freq_base: 300
+        symbol_freq_base: 500
+        tone_duration_ms: 100
+
+      # Carrier wave (like number stations)
+      carrier_wave:
+        enabled: true
+        frequency_hz: 1420.406  # Hydrogen line frequency (MHz mapped to Hz)
+        amplitude: 0.2
+
+      # Noise mix
+      noise:
+        enabled: true
+        type: "pink"  # white, pink, brown, violet
+        mix_level: 0.4  # 0.0-1.0
+
+      # Additional weird effects
+      effects:
+        granular_synthesis: false
+        bit_crush_bits: 8  # Reduce to 8-bit quality
+        ring_modulation_hz: 440
+        random_reversals: true  # Randomly reverse segments
+        glitch_probability: 0.15  # 15% chance of glitch per segment
+
+# Prompt Context Enhancement
+prompt_enhancement:
+  # Add dynamic context to prompts
+  include_timestamp: true
+  include_random_seed: true  # For variety
+
+  # Anti-repetition system
+  anti_repetition:
+    enabled: true
+    track_topics: true
+    avoid_recent_count: 5  # Don't repeat topics from last 5 segments
+
+  # Continuity between segments
+  continuity:
+    enabled: true
+    reference_previous_segment: true
+    segment_overlap_words: 10  # Try to smoothly continue
+
+# Caching (optional, for faster response)
+cache:
+  enabled: false
+  prompt_cache_size: 50
+  audio_cache_size: 100  # MB
+
+# Debug and Logging
+debug:
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_llm_prompts: true
+  log_llm_responses: true
+  save_generated_audio: false  # Save .wav files for debugging
+  audio_output_dir: "./debug_audio/"
+
+# Performance
+performance:
+  async_generation: true  # Generate next segment while playing current
+  max_concurrent_requests: 2  # Limit concurrent LLM requests
+  generation_timeout_seconds: 45

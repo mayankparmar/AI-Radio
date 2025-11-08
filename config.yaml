@@ -34,7 +34,13 @@ channels:
       - Welcome
 #      - To
 #      - Dublin
-#      - Maker 
+#      - Maker
+
+  - name: AIRadio
+    class: channels.ai_talkshow.AITalkShowChannel
+    button: R
+    auto_start: false
+    requires_internet: false  # Set to true if using online LLMs (OpenAI, Anthropic) 
       
 encoder_mapping:
   encoder1: ChillRadio
