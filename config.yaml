@@ -1,0 +1,56 @@
+channels:
+  - name: AnalogueRadio
+    class: channels.internet_radio_analogue.InternetRadioChannel
+    button: A
+    auto_start: false
+    requires_internet: true
+    stream_url:
+      - http://as-hls-ww-live.akamaized.net/pool_01505109/live/ww/bbc_radio_one/bbc_radio_one.isml/bbc_radio_one-audio%3d96000.norewind.m3u8
+      - http://as-hls-ww-live.akamaized.net/pool_74208725/live/ww/bbc_radio_two/bbc_radio_two.isml/bbc_radio_two-audio%3d96000.norewind.m3u8
+      - http://as-hls-ww-live.akamaized.net/pool_23461179/live/ww/bbc_radio_three/bbc_radio_three.isml/bbc_radio_three-audio%3d96000.norewind.m3u8
+
+  - name: LocalTunes
+    class: channels.local_mp3_player.LocalMP3Channel
+    auto_start: true
+    button: B
+    requires_internet: false
+
+  - name: ClassicRadio
+    class: channels.internet_radio.InternetRadioChannel
+    button: C
+    auto_start: false
+    requires_internet: true
+    stream_url:
+      - https://ycradio.stream.publicradio.org/ycradio.aac
+      - https://cms.stream.publicradio.org/cms.aac
+
+  - name: MorseCode
+    class: channels.morse_code.MorseCode
+    button: M
+    auto_start: false
+    requires_internet: false
+    static: false
+    text:
+      - Welcome
+#      - To
+#      - Dublin
+#      - Maker 
+      
+encoder_mapping:
+  encoder1: ChillRadio
+  encoder2: LocalTunes
+  type: 1 #1 = single button encoder... 
+
+pin_mapping:
+  enc_A_clk: 17 #GPIO17 (Physical Pin 11)
+  enc_A_dir: 18 #GPIO18 (Physical Pin 12)
+  enc_A_sw:  27 #GPIO27 (Physical Pin 13) (optional)
+
+  enc_B_clk: 15 #GPIO22 (Pin 15) 
+  enc_B_dir: 16 #GPIO23 (Pin 16)
+  enc_B_sw:  18  #GPIO24 (Pin 18) (optional)
+
+
+
+
+
